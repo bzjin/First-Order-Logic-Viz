@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<head lang="en">
+	<meta charset="utf-8">
+	<title>Tableaux Viz</title>
+
+	<!-- D3 Library --> 
+	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="http://d3js.org/queue.v1.min.js"></script>
+	<!-- Tooltip -->
+	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+	<!-- Google Fonts -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans|Raleway:400,700" rel="stylesheet">
+	<!-- Jquery -->
+	<script src="https://code.jquery.com/jquery-3.0.0.min.js"   integrity="sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0="   crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<!-- Bootstrap-->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="app.css"/>
+</head>
+
+<body>
+<div class="col-md-12">
+	<h1>Tableaux Visualized </h1>
+	<h4> Beatrice Jin CS4860 Fall 2016 Final Project </h4>
+	<p> A tableaux proof for a formula <span class="true">X</span> is constructed by iteratively extending the root tableau <span class="false">FX</span> until it is complete. If the resulting tableau is closed, the formula is true, otherwise it is not. A tableau can be extended by applying either an α-rule or a β-rule.</p>
+
+	<p>The α-rules decompose as follows: </p>
+	<ul>
+		<li class="true">T(X∧Y)<br>TX<br>TY</li>
+		<li class="false">F(X∨Y)<br>FX<br>FY</li>
+		<li class="false">F(X⇒Y)<br><span class="true">TX</span><br>FY</li>
+		<li class="true">T(¬X)<br><span class="false">FX</span></li>
+		<li class="false">F(¬X)<br><span class="true">TX</span></li>
+	</ul>
+
+	<p> And the β-rules decompose as follows (β-formulas are underlined throughout the visualization): </p> 
+	<ul>
+		<li class="false"><span class="beta">F(X∧Y)</span><br>FX<br>FY</li>
+		<li class="true"><span class="beta">T(X∨Y)</span><br>TX<br>TY</li>
+		<li class="true"><span class="beta">T(X⇒Y)</span><br><span class="false">FX</span><br>TY</li>
+	</ul>
+
+	<p> We see that every rule decomposes the formula, so the process must eventually terminate.</p>
+
+	<h2> The original Tableaux method </h2>
+	<p> The simplest method of decomposing a formula is by top-down order and mark them off as used. </p>
+
+	<div id="chart" class="col-md-12"></div>
+
+	<h2> Block Tableaux </h2>
+	<p> The original tableaux method is makes it difficult for humans to keep track of the formulas that have and haven't been decomposed. One way of redesigning tableaux decomposition is to support local reasoning, where each formula is still a node, but each β-formula decomposes into two nodes, side by side.  </p>
+	<div id="block" class="col-md-12"></div>
+
+	<h2> Tableaux to Refinement </h2>
+	<p> The simplest method of decomposing a formula is by top-down order and mark them off as used. </p>
+
+	<h2> Challenges in this Project </h2>
+	<p> This project was designed to <b> print and display </b> the steps of logical reasoning. The code</p>
+
+	<style> text { font-weight: 700; text-anchor: middle; }</style>
+</div>
+
+</body>
+	<script src="app.js"></script>
+
+</html>
