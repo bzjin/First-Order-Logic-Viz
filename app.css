@@ -99,3 +99,25 @@ li {
 svg:not(:root) {
     overflow: visible;
 }
+
+.demo {
+  border:none;
+}
+.demo th {
+  border:none;
+  background: none;
+  padding-left: 10px;
+  padding-bottom: 3px;
+  border-bottom: solid black 2px;
+}
+.demo td {
+  width: 150px;
+  border: black dotted 1px;
+  background:none;
+  padding-left: 10px;
+}
+
+.demo caption {
+  caption-side:bottom;
+  font-size: 10px;
+}

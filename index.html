@@ -5,9 +5,6 @@
 
 	<!-- D3 Library --> 
 	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-	<script src="http://d3js.org/queue.v1.min.js"></script>
-	<!-- Tooltip -->
-	<script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 	<!-- Google Fonts -->
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:700|Open+Sans:400,700|Raleway:400,700" rel="stylesheet">
 	<!-- Jquery -->
@@ -26,7 +23,7 @@
 	<h4> Beatrice Jin CS4860 Fall 2016 Final Project </h4>
 
 	<h2> Purpose </h2>
-	<p> It is obviously not difficult to "hard-code" several elements to be placed in a certain arrangement on a computer screen. The challenge of this project was to find an appropriate way of "automating" the process such that any formula could be an "input" that has a standardized output. This project takes these inputs and visualizes them according to Tableaux rules, in browser. This points to the subject of <em>automated reasoning</em> we discussed in class - mainly related to proof assistants. This project does not attempt, however distinguish valid formulas from invalid formulas. The code does not truly make <em>conclusions</em>, even though it does some reasoning; rather, its purpose is to <em> print</em>. In this project, the first three examples used in the two methods are valid formulas. The fourth example is an invalid formula.</p>
+	<p> It is obviously not difficult to "hard-code" several SVG elements to be placed in a certain arrangement on a computer screen. The challenge of this project was to find an appropriate way of "automating" the process such that any formula could be an "input" that has a standardized output. This project takes these inputs and visualizes them according to Tableaux rules, in browser. This points to the subject of <em>automated reasoning</em> we discussed in class - mainly related to proof assistants. This project does not attempt, however distinguish valid formulas from invalid formulas. The code does not truly make <em>conclusions</em>, even though it does some reasoning; rather, its purpose is to <em> print</em>. In this project, the first three examples used in the two methods are valid formulas. The fourth example is an invalid formula.</p>
 
 	<h2> About Tableaux </h2>
 	<p> A tableaux proof for a formula <span class="true">X</span> is constructed by iteratively decomposing the root tableau <span class="false">FX</span> until it is complete. If the resulting tableau is closed, tableaux has essentially given us a "counterexample", so the formula must be true "by contradiction." If the tableau does not close, the original formula is not true. A tableau can be decomposed by applying either an α-rule or a β-rule.</p>
@@ -70,14 +67,57 @@
 	<p> A small disclaimer is due here: there does exist a pre-existing sub-library in D3 that supports nested arrays, called <a href="http://mbostock.github.io/d3/talk/20111018/tree.html">d3-hierarchy</a>. This sub-library contains layout algorithms for visualizing hierarchical data, typical to most languages that support parent/child data structures. It would have supported breadth-first traversal, which is an advantage over the depth-first traversal problems that we see in block tableaux. I wrote my own code because it directly compares the original and block tableaux methods, while sacrificing some visual vertical dissonance in the block method.</p>
 	
 	<h3>Calculating Coordinates, not Validity</h3>
-	<p> This project was designed to <span class="bold"> print and display </span> the steps of logical reasoning. The code "remembers" the formula and its place in the decomposition of formula only because the main function is iterative and ends only when the helper function <span class="function">printer</span> splits the string input enough times - not because each formula has an index. That is, in the original tableaux method code, the function does not know what the "level" is while it prints out a decomposed formula. It only knows its level because the y-position (<span class="function">yPos</span>) of the text svg element is changed. This also means that the <span class="function">printer</span> function in the code does not remember the formula, and therefore cannot directly tell us whether a branch is closed. </p>
+	<p> This project was designed to <span class="bold"> print and display </span> the steps of logical reasoning. The code "remembers" the formula and its place in the decomposition of formula only because the main function is iterative and ends only when the helper function <span class="function">printer</span> splits the string input enough times - not because each formula has an index. That is, in the original tableaux method code, the function does not know what the "level" is while it prints out a decomposed formula. It only knows its level because the y-position (<span class="function">yPos</span>) of the text SVG element is changed. This also means that the <span class="function">printer</span> function in the code does not remember the formula, and therefore cannot directly tell us whether a branch is closed. </p>
 
-	<p>Instead, we know that a branch is closed by intuition - when the formula that is printed is <span class="true">TX</span> or <span class="false">FX</span>. The function <span class="function">TF</span> is only place we identify what the formula is before it is pointed to the 8 helper functions (<span class="function">trueAnd, falseOr, falseThen, trueNot, falseNot, falseAnd, trueOr, trueThen</span>) for printing. <span class="function">TF</span> therefore cannot change the text that's printed. We work our way around this by assigning and then reassigning the variable <span class="function">now</span> to the most recently created text element. Then, when a β-formula is identified, it retroactively assigns the style <span class="function">text-decoration: underline</span> to <span class="function">now</span>. Note that regardless of printing format or decomposition method, the formula always finishes decomposing into its most basic components, <span class="true">TX</span> or <span class="false">FX</span>. </p>
+	<p>Instead, we know that a branch is closed by intuition - when the formula that is printed is <span class="true">TX</span> or <span class="false">FX</span>. The function <span class="function">TF</span> is only place we identify what the formula is before it is pointed to the 8 helper functions (<span class="function">trueAnd, falseOr, falseThen, trueNot, falseNot, falseAnd, trueOr, trueThen</span>) for printing. <span class="function">TF</span> therefore cannot change the text that's printed. We work our way around this by assigning and then reassigning the variable <span class="function">now</span> to the most recently created text element. Then, when a β-formula is identified, it retroactively assigns the CSS style <span class="function">text-decoration: underline</span> to <span class="function">now</span>. Note that regardless of printing format or decomposition method, the formula always finishes decomposing into its most basic components, <span class="true">TX</span> or <span class="false">FX</span>. </p>
 
 	<h3>A Printing Function and Its Advantages</h3>
 	<p>We return now to the point brought up in the introductory purpose statement, that the code does not draw conclusions. That is, the code will print the decomposition of every formula, regardless of whether it is valid. We see this in the fourth example used in each of these methods, <span class="false">F((P ⇒ Q)⇒ (¬Q ⇒ P))</span>. The formula is fully decomposes into <span class="false">FP, FQ, FP,</span> and<span class="true"> TQ</span>. Notice that <span class="true">TP</span> is not among these formulas, and therefore we cannot contradict <span class="false">FP</span>, and therefore we also cannot contradict the original falsified statement. </p>
 
 	<p> Allowing the code to print the full tableaux decomposition is useful it that we can see not only which formulas cannot be true, but also to have a full counterexample that makes the formula false. For instance, in the example above, we know that letting P and Q be false lets us trace back and conclude <span class="false">F((P ⇒ Q)⇒ (¬Q ⇒ P))</span> to counter the original statement. This is like a "shortcut" to a truth table; instead of performing the casework and guessing at whether P and/or Q are true and/or false, we can pull out the aforementioned case right away.</p>
+
+	<table class="demo">
+	<caption>The work required to do a truth table to both (dis)prove the validity of a statement, and then to find a contradiction, can become exponentially inefficient as more formulas are introduced.</caption>
+	<thead>
+	<tr>
+		<th>P</th>
+		<th>Q</th>
+		<th>(P ⇒ Q)</th>
+		<th>(¬Q ⇒ P)</th>
+		<th>(P ⇒ Q)⇒ (¬Q ⇒ P)</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr class="true">
+		<td>T</td>
+		<td>T</td>
+		<td>T</td>
+		<td>T</td>
+		<td>T</td>
+	</tr>
+	<tr class="true">
+		<td>T</td>
+		<td>F</td>
+		<td>F</td>
+		<td>T</td>
+		<td>T</td>
+	</tr>
+	<tr class="true">
+		<td>F</td>
+		<td>T</td>
+		<td>T</td>
+		<td>T</td>
+		<td>T</td>
+	</tr>
+	<tr class="false">
+		<td>F</td>
+		<td>F</td>
+		<td>T</td>
+		<td>F</td>
+		<td>F</td>
+	</tr>
+	<tbody>
+</table>
 
 	<h2> Code </h2>
 	<p>The source code for this project was written from scratch and is hosted on <a href="https://github.com/bzjin/First-Order-Logic-Viz">my Github</a>. The visualizations are created with a JavaScript library called <a href="https://d3js.org/">D3.JS</a>.</p>
