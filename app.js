@@ -1,33 +1,36 @@
 
 var svg = d3.select("#chart").append("svg")
-		.attr("width", 960)
+		.attr("width", 1200)
 
 var svgB = d3.select("#block").append("svg")
-		.attr("width", 960)
+		.attr("width", 1600)
 
-var tC = "#36D1C4";
-var fC = "#F6318C";
+var tC = "#068481";
+var fC = "#CC1100";
 
 var now; 
 
 var testcase = [["F"], ["⇒"], [["⇒"], ["P"], ["P"]], ["P"]]; // Falsifies statement: ((P ⇒ P) ⇒ P)
 var testcase2 = [["F"], "⇒", ["∧", ["¬", ["P"]], ["¬", ["Q"]]], ["¬", ["∨", ["P"], ["Q"]]]]; // Falsifies statement: (((P ⇒ Q) ⇒ P) ⇒ P)
 var testcase3 = [["F"], "⇒", ["⇒", ["⇒", ["P"], ["Q"]], ["P"]], ["P"]]; // Falsifies statement: ((¬ P ∧ ¬ Q) ⇒ ¬ (P ∨ Q))
+var testcase4 = [["F"], "⇒", ["⇒", ["P"], ["Q"]], ["⇒", ["¬", ["Q"]], ["P"]]]; // Falsifies statement: ((P ⇒ Q) ⇒ (¬ Q ⇒ P))
 
-makeTree(testcase, .5);
-makeTree(testcase3, 2);
-makeTree(testcase2, 3.5);
+originalTableaux(testcase, .5);
+originalTableaux(testcase3, 2);
+originalTableaux(testcase2, 3.5);
+originalTableaux(testcase4, 5);
 
 var testcase = [["F"], ["⇒"], [["⇒"], ["P"], ["P"]], ["P"]]; // Falsifies statement: ((P ⇒ P) ⇒ P)
 var testcase2 = [["F"], "⇒", ["∧", ["¬", ["P"]], ["¬", ["Q"]]], ["¬", ["∨", ["P"], ["Q"]]]]; // Falsifies statement: (((P ⇒ Q) ⇒ P) ⇒ P)
 var testcase3 = [["F"], "⇒", ["⇒", ["⇒", ["P"], ["Q"]], ["P"]], ["P"]]; // Falsifies statement: ((¬ P ∧ ¬ Q) ⇒ ¬ (P ∨ Q))
+var testcase4 = [["F"], "⇒", ["⇒", ["P"], ["Q"]], ["⇒", ["¬", ["Q"]], ["P"]]]; // Falsifies statement: ((P ⇒ Q) ⇒ (¬ Q ⇒ P))
 
-blockTree(testcase, .5);
-blockTree(testcase3, 2);
-blockTree(testcase2, 3.5);
+blockTableaux(testcase, 1);
+blockTableaux(testcase3, 3);
+blockTableaux(testcase2, 5);
+blockTableaux(testcase4, 7);
 
-
-function makeTree (truth, x) { // Original Tableaux Method
+function originalTableaux (truth, x) { // Original Tableaux Method
 	var yPos = 70; 
 	var xPos = x * 200;
 
@@ -195,9 +198,11 @@ function makeTree (truth, x) { // Original Tableaux Method
 	TF(truth);
 }
 
-function blockTree (truth, x) { // Original Tableaux Method
+function blockTableaux (truth, x) { // Original Tableaux Method
 	var yPos = 70; 
 	var xPos = x * 200;
+	var inc = 80;
+	var xCo = x * 200;
 
 	svgB.append("text").attr("x", xPos).attr("y", yPos - 45).style("fill", tC).style("font-weight", 300)
 		.text("Prove: " + printer(truth.slice(1)))
@@ -220,147 +225,148 @@ function blockTree (truth, x) { // Original Tableaux Method
 		return string; 
 	}
 
-	function TF (array) {
+	function TF (array, xSub) {
 		var returnVal = "";
 		if (array[0] == "T" && array[1] == "∧"){
-			returnVal = trueAnd(array.slice(2))
+			returnVal = trueAnd(array.slice(2), xSub)
 		} else if (array[0] == "T" && array[1] == "∨"){
 			now.style("text-decoration", "underline");
-			returnVal = trueOr(array.slice(2))
+			returnVal = trueOr(array.slice(2), xSub)
 		} else if (array[0] == "T" && array[1] == "⇒"){
 			now.style("text-decoration", "underline");
-			returnVal = trueThen(array.slice(2))
+			returnVal = trueThen(array.slice(2), xSub)
 		} else if (array[0] == "T" && array[1] == "¬"){
-			returnVal = trueNot(array.slice(2))
+			returnVal = trueNot(array.slice(2), xSub)
 		} else if (array[0] == "F" && array[1] == "∧"){
 			now.style("text-decoration", "underline");
-			returnVal = falseAnd(array.slice(2))
+			returnVal = falseAnd(array.slice(2), xSub)
 		} else if (array[0] == "F" && array[1] == "∨"){
-			returnVal = falseOr(array.slice(2))
+			returnVal = falseOr(array.slice(2), xSub)
 		} else if (array[0] == "F" && array[1] == "⇒"){
-			returnVal = falseThen(array.slice(2))
+			returnVal = falseThen(array.slice(2), xSub)
 		} else if (array[0] == "F" && array[1] == "¬"){
-			returnVal = falseNot(array.slice(2))
+			returnVal = falseNot(array.slice(2), xSub)
 		} 
 		return returnVal;
 	}
 
-	function trueAnd (a) { //Since T(X∧Y) means TX and TY
+	function trueAnd (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["T"]);
 		a[1].unshift(["T"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
+		now = svgB.append("text").attr("x", xCo - inc).attr("y", yPos).style("fill", tC)
 			.text("T" + printer(a[0].slice(1)))
-		yPos += 15; 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
-
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
+		now = svgB.append("text").attr("x", xCo + inc).attr("y", yPos).style("fill", tC)
 			.text("T" + printer(a[1].slice(1))) 
-		yPos += 15; 
-		if (a[1].slice(1).length > 1) { TF(a[1]);}
+
+		yPos += 15;
+		inc = inc/1.5; 
+
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo - 1.5*inc);} 
+		if (a[1].slice(1).length > 1) { TF(a[1], xCo + 1.5*inc);}
 	}
 
-	function falseAnd (a) { //Since T(X∧Y) means TX and TY
+	function falseAnd (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["F"]);
 		a[1].unshift(["F"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo - inc).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[0].slice(1)))
-		yPos += 15; 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo + inc).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[1].slice(1))) 
-		yPos += 15; 
+		yPos += 15;
+		inc = inc/1.5; 
 
-		if (a[1].slice(1).length > 1) { TF(a[1]);}
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo - 1.5*inc);} 
+		if (a[1].slice(1).length > 1) { TF(a[1], xCo + 1.5*inc);}
 	}
 
-	function trueOr (a) { //Since T(X∧Y) means TX and TY
+	function trueOr (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["T"]);
 		a[1].unshift(["T"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
+		now = svgB.append("text").attr("x", xCo - inc).attr("y", yPos).style("fill", tC)
 			.text("T" + printer(a[0].slice(1)))
-		yPos += 15; 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
+		now = svgB.append("text").attr("x", xCo + inc).attr("y", yPos).style("fill", tC)
 			.text("T" + printer(a[1].slice(1))) 
-		yPos += 15; 
+		yPos += 15;
+		inc = inc/1.5; 
 
-		if (a[1].slice(1).length > 1) { TF(a[1]);}
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo - 1.5*inc);} 
+		if (a[1].slice(1).length > 1) { TF(a[1], xCo + 1.5*inc);}
 	}
 
-	function falseOr (a) { //Since T(X∧Y) means TX and TY
+	function falseOr (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["F"]);
 		a[1].unshift(["F"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo - inc).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[0].slice(1)))
-		yPos += 15; 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo + inc).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[1].slice(1))) 
 		yPos += 15; 
+		inc = inc/1.5; 
 
-		if (a[1].slice(1).length > 1) { TF(a[1]);}
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo - 1.5*inc);} 
+		if (a[1].slice(1).length > 1) { TF(a[1], xCo + 1.5*inc);}	
 	}
 
-	function trueThen (a) { //Since T(X∧Y) means TX and TY
+	function trueThen (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["F"]);
 		a[1].unshift(["T"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo - inc).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[0].slice(1)))
-		yPos += 15; 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
+		now = svgB.append("text").attr("x", xCo + inc).attr("y", yPos).style("fill", tC)
 			.text("T" + printer(a[1].slice(1))) 
-		yPos += 15; 
+		yPos += 15;
+		inc = inc/1.5; 
 
-		if (a[1].slice(1).length > 1) { TF(a[1]);}
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo - 1.5*inc);} 
+		if (a[1].slice(1).length > 1) { TF(a[1], xCo + 1.5*inc);}
 	}
 
-	function falseThen (a) { //Since T(X∧Y) means TX and TY
+	function falseThen (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["T"]);
 		a[1].unshift(["F"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
-			.text("T" + printer(a[0].slice(1)))
-		yPos += 15; 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
-
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo + inc).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[1].slice(1))) 
-		yPos += 15; 
+	
+		now = svgB.append("text").attr("x", xCo - inc).attr("y", yPos).style("fill", tC)
+			.text("T" + printer(a[0].slice(1)))
 
-		if (a[1].slice(1).length > 1) { TF(a[1]);}
+		yPos += 15;
+		inc = inc/1.5; 
+
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo - 1.5*inc);} 
+		if (a[1].slice(1).length > 1) { TF(a[1], xCo + 1.5*inc);}
 	}
 
-	function trueNot (a) { //Since T(X∧Y) means TX and TY
+	function trueNot (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["F"]);
-
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", fC)
+		now = svgB.append("text").attr("x", xCo).attr("y", yPos).style("fill", fC)
 			.text("F" + printer(a[0].slice(1)))
 		yPos += 15; 
 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo);} 
 	}
 
-	function falseNot (a) { //Since T(X∧Y) means TX and TY
+	function falseNot (a, xCo) { //Since T(X∧Y) means TX and TY
 		a[0].unshift(["T"]);
 
-		now = svgB.append("text").attr("x", xPos).attr("y", yPos).style("fill", tC)
+		now = svgB.append("text").attr("x", xCo).attr("y", yPos).style("fill", tC)
 			.text("T" + printer(a[0].slice(1)))
 		yPos += 15; 
 
-		if (a[0].slice(1).length > 1) { TF(a[0]);} 
+		if (a[0].slice(1).length > 1) { TF(a[0], xCo);} 
 	}
 
-	TF(truth);
+	TF(truth, xCo);
 }
 
 

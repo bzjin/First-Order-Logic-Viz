@@ -1,7 +1,7 @@
 body {
-  background: linear-gradient(#191b1d, black);
-  margin-left: 150px;
-  margin-right: 150px;
+  background: #ddd;
+  margin-left: 100px;
+  margin-right: 100px;
 }
 
 div {
@@ -9,7 +9,7 @@ div {
 }
 
 h1, h2, h3, h4, p { 
-  color: #fff;
+  color: #191919;
   font-family: "Raleway";
 
 }
@@ -38,20 +38,30 @@ p {
   top:20;
   left:0;
   overflow-x: scroll;
+  margin-bottom: 20px;
 }
 
 .false { 
-  color: #F6318C;
+  color: #CC1100;
   font-weight: 700;
 }
 
 .true { 
-  color: #36D1C4;
+  color: #068481;
   font-weight: 700;
+}
+
+.bold {
+  font-style: italic !important;
 }
 
 .beta {
   text-decoration: underline;
+}
+
+.function { 
+  font-family: "Source Code Pro" !important;
+  font-weight: 700 !important;
 }
 
 li {
@@ -60,6 +70,7 @@ li {
   text-align: center;
   vertical-align: top;
   padding-right: 10%;
+  padding-bottom: 20px;
 }
 
 
@@ -67,11 +78,11 @@ li {
     width: 10px;
 }
 ::-webkit-scrollbar-track {
-    background-color: rgba(255, 255, 255, .3); 
+    background-color: rgba(0, 0, 0, .3); 
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, .3); 
+    background-color: rgba(0, 0, 0, .3); 
     border-radius: 10px;
 }
 
